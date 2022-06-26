@@ -20,8 +20,8 @@ class MLP(Module):
 
     def forward(self, data):
         data = data.to(self.device)
-        batch = data.batch
-        batch_size = batch.max() + 1
+        batch = torch.Tensor([0])
+        print(batch.shape)
         x = data.x
         x = tanh(self.lin1(x))
         x = tanh(self.lin2(x))

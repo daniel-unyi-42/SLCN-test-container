@@ -49,28 +49,35 @@ class Slcn_algorithm(ClassificationAlgorithm):
 
         #This path should lead to your model weights
         if execute_in_docker:
-            self.path_model = "/opt/algorithm/checkpoints/ckpt.pth"
+            self.L_path_model = "/opt/algorithm/checkpoints/L_MLP.pth"
+            self.R_path_model = "/opt/algorithm/checkpoints/R_MLP.pth"
         else:
-            self.path_model = "./weights/ckpt.pth"
+            self.L_path_model = "./weights/L_MLP.pth"
+            self.R_path_model = "./weights/R_MLP.pth"
 
         #You may adapt this to your model/algorithm here.
-        self.model = MLP(4, [16, 16, 16, 16], 1, device=self.device)
+        self.L_model = MLP(4, [16, 16, 16, 16], 1, device=self.device)
+        self.R_model = MLP(4, [16, 16, 16, 16], 1, device=self.device)
         #loading model weights
-        self.model.load_state_dict(torch.load(self.path_model,map_location=self.device),strict=False)
+        self.L_model.load_state_dict(torch.load(self.L_path_model, map_location=self.device),strict=False)
+        self.R_model.load_state_dict(torch.load(self.R_path_model, map_location=self.device),strict=False)
     
     def save(self):
         with open(str(self._output_file), "w") as f:
             json.dump(self._case_results[0], f)
 
     def process_case(self, *, idx, case):
+        input_image_file_path = case["path"]
+        print(input_image_file_path)
+
         # Load and test the image for this case
         input_image, _ = self._load_input_image(case=case)
         # Detect and score candidates
-        prediction = self.predict(input_image=input_image)
+        prediction = self.predict(input_image=input_image, input_image_file_path)
         # Return a float for prediction
         return float(prediction)
 
-    def predict(self, *, input_image: SimpleITK.Image) -> Dict:
+    def predict(self, *, input_image: SimpleITK.Image, input_image_file_path) -> Dict:
 
         # Extract a numpy array with image data from the SimpleITK Image
         image_data = SimpleITK.GetArrayFromImage(input_image)
@@ -84,12 +91,27 @@ class Slcn_algorithm(ClassificationAlgorithm):
             pass
         else:
             image_data = np.transpose(image_data, (1,0))
+            
+        if execute_in_docker:
+            means = np.load('/opt/algorithm/utils/means.npy')
+            stds = np.load('/opt/algorithm/utils/stds.npy')
+        else:
+            means = np.load('./utils/means.npy')
+            stds = np.load('./utils/stds.npy')
 
-        image_sequence = Data(x=image_data, batch=1)
+        image_data = (image_data - means.reshape(1, 4)) / stds.reshape(1, 4)
+
+        image_sequence = Data(x=image_data)
 
         with torch.no_grad():
+        
+            assert '_L' in input_image_file_path or '_R' in input_image_file_path
 
-            prediction = self.model(image_sequence)
+            if '_L' in input_image_file_path:
+                prediction = self.L_model(image_sequence)
+            
+            if '_R' in input_image_file_path:
+                prediction = self.R_model(image_sequence)
         
         return prediction.cpu().numpy()[0][0]
 
