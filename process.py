@@ -61,6 +61,8 @@ class Slcn_algorithm(ClassificationAlgorithm):
         #loading model weights
         self.L_model.load_state_dict(torch.load(self.L_path_model, map_location=self.device),strict=False)
         self.R_model.load_state_dict(torch.load(self.R_path_model, map_location=self.device),strict=False)
+        
+        self.num = 0
     
     def save(self):
         with open(str(self._output_file), "w") as f:
@@ -98,19 +100,17 @@ class Slcn_algorithm(ClassificationAlgorithm):
             means = np.load('./utils/means.npy')
             stds = np.load('./utils/stds.npy')
 
-        image_data = (image_data - means.reshape(1, 4)) / stds.reshape(1, 4)
+        image_data = (image_data - means.reshape(4, 1)) / stds.reshape(4, 1)
 
         image_sequence = Data(x=image_data)
 
         with torch.no_grad():
         
-            assert '_L' in input_image_file_path or '_R' in input_image_file_path
-
-            if '_L' in input_image_file_path:
+            if self.num % 2 == 0:
                 prediction = self.L_model(image_sequence)
-            
-            if '_R' in input_image_file_path:
+            else:
                 prediction = self.R_model(image_sequence)
+            self.num += 1
         
         return prediction.cpu().numpy()[0][0]
 
