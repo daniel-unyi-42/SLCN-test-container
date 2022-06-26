@@ -73,11 +73,11 @@ class Slcn_algorithm(ClassificationAlgorithm):
         # Load and test the image for this case
         input_image, _ = self._load_input_image(case=case)
         # Detect and score candidates
-        prediction = self.predict(input_image=input_image, input_image_file_path)
+        prediction = self.predict(input_image_file_path, input_image=input_image)
         # Return a float for prediction
         return float(prediction)
 
-    def predict(self, *, input_image: SimpleITK.Image, input_image_file_path) -> Dict:
+    def predict(self, *, input_image_file_path, input_image: SimpleITK.Image) -> Dict:
 
         # Extract a numpy array with image data from the SimpleITK Image
         image_data = SimpleITK.GetArrayFromImage(input_image)
