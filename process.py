@@ -94,11 +94,11 @@ class Slcn_algorithm(ClassificationAlgorithm):
             image_data = np.transpose(image_data, (1,0))
             
         if execute_in_docker:
-            means = np.load('/opt/algorithm/utils/means.npy')
-            stds = np.load('/opt/algorithm/utils/stds.npy')
+            means = torch.from_numpy(np.load('/opt/algorithm/utils/means.npy'))
+            stds = torch.from_numpy(np.load('/opt/algorithm/utils/stds.npy'))
         else:
-            means = np.load('./utils/means.npy')
-            stds = np.load('./utils/stds.npy')
+            means = torch.from_numpy(np.load('./utils/means.npy'))
+            stds = torch.from_numpy(np.load('./utils/stds.npy'))
 
         image_data = (image_data - means.reshape(4, 1)) / stds.reshape(4, 1)
 
