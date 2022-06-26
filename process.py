@@ -102,15 +102,11 @@ class Slcn_algorithm(ClassificationAlgorithm):
 
         image_data = (image_data - means.reshape(4, 1)) / stds.reshape(4, 1)
 
-        image_sequence = Data(x=torch.from_numpy(image_data))
+        image_sequence = Data(x=torch.from_numpy(image_data.T))
 
         with torch.no_grad():
         
-            if self.num % 2 == 0:
-                prediction = self.L_model(image_sequence)
-            else:
-                prediction = self.R_model(image_sequence)
-            self.num += 1
+            prediction = self.L_model(image_sequence)
         
         return prediction.cpu().numpy()[0][0]
 
