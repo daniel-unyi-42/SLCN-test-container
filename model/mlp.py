@@ -8,7 +8,7 @@ from torch import sigmoid, tanh
 class MLP(Module):
 
     def __init__(self, in_dim, hidden_dims, out_dim, device):
-        super(MLP_nometa, self).__init__()
+        super(MLP, self).__init__()
         self.device = device
         self.lin1 = Linear(in_dim, hidden_dims[0])
         self.lin2 = Linear(hidden_dims[0], hidden_dims[1])
