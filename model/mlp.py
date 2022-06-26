@@ -20,7 +20,7 @@ class MLP(Module):
 
     def forward(self, data):
         data = data.to(self.device)
-        batch = torch.Tensor([0]).to(self.device)
+        batch = torch.LongTensor([0]).to(self.device)
         x = data.x
         x = tanh(self.lin1(x))
         x = tanh(self.lin2(x))
@@ -30,4 +30,4 @@ class MLP(Module):
         x_mean = global_mean_pool(x, batch)
         x_c = torch.cat([x_max, x_mean], dim=1)
         x_c = tanh(self.lin5(x_c))
-        return self.lin6(x_c).squeeze()
+        return self.lin6(x_c)
