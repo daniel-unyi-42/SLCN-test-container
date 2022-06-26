@@ -67,17 +67,16 @@ class Slcn_algorithm(ClassificationAlgorithm):
             json.dump(self._case_results[0], f)
 
     def process_case(self, *, idx, case):
-        input_image_file_path = case["path"]
-        print(input_image_file_path)
 
         # Load and test the image for this case
-        input_image, _ = self._load_input_image(case=case)
+        input_image, input_image_file_path = self._load_input_image(case=case)
+        print(input_image_file_path)
         # Detect and score candidates
-        prediction = self.predict(input_image_file_path, input_image=input_image)
+        prediction = self.predict(input_image=input_image, input_image_file_path=input_image_file_path)
         # Return a float for prediction
         return float(prediction)
 
-    def predict(self, *, input_image_file_path, input_image: SimpleITK.Image) -> Dict:
+    def predict(self, *, input_image: SimpleITK.Image, input_image_file_path: str) -> Dict:
 
         # Extract a numpy array with image data from the SimpleITK Image
         image_data = SimpleITK.GetArrayFromImage(input_image)
