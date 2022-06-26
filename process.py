@@ -54,7 +54,7 @@ class Slcn_algorithm(ClassificationAlgorithm):
             self.path_model = "./weights/ckpt.pth"
 
         #You may adapt this to your model/algorithm here.
-        self.model = MLP(4, [6, 6, 6, 6], 1, device=self.device)
+        self.model = MLP(4, [16, 16, 16, 16], 1, device=self.device)
         #loading model weights
         self.model.load_state_dict(torch.load(self.path_model,map_location=self.device),strict=False)
     
