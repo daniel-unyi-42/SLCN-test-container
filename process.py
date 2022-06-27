@@ -108,7 +108,7 @@ class Slcn_algorithm(ClassificationAlgorithm):
         
         print(L)
 
-        image_data = (image_data - means.reshape(4, 1)) / stds.reshape(4, 1)
+        image_data = (image_data - means.reshape(1, 4)) / stds.reshape(1, 4)
 
         image_sequence = Data(x=torch.from_numpy(image_data))
 
