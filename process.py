@@ -23,6 +23,7 @@ import pandas as pd
 from pathlib import Path
 import json
 from glob import glob
+import nibabel as nib
 
 execute_in_docker = True
 
@@ -72,7 +73,6 @@ class Slcn_algorithm(ClassificationAlgorithm):
 
         # Load and test the image for this case
         input_image, input_image_file_path = self._load_input_image(case=case)
-        print(input_image_file_path)
         # Detect and score candidates
         prediction = self.predict(input_image=input_image, input_image_file_path=input_image_file_path)
         # Return a float for prediction
@@ -88,7 +88,7 @@ class Slcn_algorithm(ClassificationAlgorithm):
         ###                                                                     ###
 
         ## input image of shape (N vertices, C channels)
-        if image_data.shape[0]==4:
+        if image_data.shape[1]==4:
             pass
         else:
             image_data = np.transpose(image_data, (1,0))
@@ -96,17 +96,28 @@ class Slcn_algorithm(ClassificationAlgorithm):
         if execute_in_docker:
             means = np.load('/opt/algorithm/utils/means.npy')
             stds = np.load('/opt/algorithm/utils/stds.npy')
+            Lref = nib.load('/opt/algorithm/utils/Lref.gii')
         else:
             means = np.load('./utils/means.npy')
             stds = np.load('./utils/stds.npy')
+            Lref = nib.load('./utils/Lref.gii')
+
+        Lref = np.stack(Lref.agg_data(), axis=1)
+        
+        L = np.absolute(np.subtract(image_data, Lref)).mean() < 1.385
+        
+        print(L)
 
         image_data = (image_data - means.reshape(4, 1)) / stds.reshape(4, 1)
 
-        image_sequence = Data(x=torch.from_numpy(image_data.T))
+        image_sequence = Data(x=torch.from_numpy(image_data))
 
         with torch.no_grad():
         
-            prediction = self.L_model(image_sequence)
+            if L:
+                prediction = self.L_model(image_sequence)
+            else:
+                prediction = self.R_model(image_sequence)
         
         return prediction.cpu().numpy()[0][0]
 
