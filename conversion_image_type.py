@@ -46,6 +46,3 @@ mha_img1 = sitk.ReadImage(new_filename)
 
 #### Get array from image using sitk ####
 img1_array = sitk.GetArrayFromImage(mha_img1)
-
-print(filename)
-print(new_filename)

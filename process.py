@@ -102,9 +102,9 @@ class Slcn_algorithm(ClassificationAlgorithm):
 
         Lref = np.stack(Lref.agg_data(), axis=1)
         
-        L = np.absolute(np.subtract(image_data, Lref)).mean() < 1.385
+        error = np.absolute(np.subtract(image_data, Lref)).mean()
         
-        print(L)
+        print(error)
 
         image_data = (image_data - means.reshape(1, 4)) / stds.reshape(1, 4)
 
@@ -112,10 +112,8 @@ class Slcn_algorithm(ClassificationAlgorithm):
 
         with torch.no_grad():
         
-            prediction = self.L_model(image_sequence) if L else self.R_model(image_sequence)
-        
-        print(prediction.cpu().numpy()[0][0])
-        
+            prediction = self.L_model(image_sequence) if error < 1.385 else self.R_model(image_sequence)
+
         return prediction.cpu().numpy()[0][0]
 
 if __name__ == "__main__":
