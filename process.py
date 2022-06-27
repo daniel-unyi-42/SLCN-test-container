@@ -62,8 +62,6 @@ class Slcn_algorithm(ClassificationAlgorithm):
         #loading model weights
         self.L_model.load_state_dict(torch.load(self.L_path_model, map_location=self.device),strict=False)
         self.R_model.load_state_dict(torch.load(self.R_path_model, map_location=self.device),strict=False)
-        
-        self.num = 0
     
     def save(self):
         with open(str(self._output_file), "w") as f:
@@ -114,10 +112,9 @@ class Slcn_algorithm(ClassificationAlgorithm):
 
         with torch.no_grad():
         
-            if L:
-                prediction = self.L_model(image_sequence)
-            else:
-                prediction = self.R_model(image_sequence)
+            prediction = self.L_model(image_sequence) if L else self.R_model(image_sequence)
+        
+        print(prediction.cpu().numpy()[0][0])
         
         return prediction.cpu().numpy()[0][0]
 
