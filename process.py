@@ -92,13 +92,13 @@ class Slcn_algorithm(ClassificationAlgorithm):
             image_data = np.transpose(image_data, (1,0))
 
         if execute_in_docker:
-            means = np.load('/opt/algorithm/utils/means.npy')
-            stds = np.load('/opt/algorithm/utils/stds.npy')
-            Lref = nib.load('/opt/algorithm/utils/Lref.gii')
+            means = np.load('/opt/algorithm/utils/means_template.npy')
+            stds = np.load('/opt/algorithm/utils/stds_template.npy')
+            Lref = nib.load('/opt/algorithm/utils/Lref_template.gii')
         else:
-            means = np.load('./utils/means.npy')
-            stds = np.load('./utils/stds.npy')
-            Lref = nib.load('./utils/Lref.gii')
+            means = np.load('./utils/means_template.npy')
+            stds = np.load('./utils/stds_template.npy')
+            Lref = nib.load('./utils/Lref_template.gii')
 
         Lref = np.stack(Lref.agg_data(), axis=1)
         
