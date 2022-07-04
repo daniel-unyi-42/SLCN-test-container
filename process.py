@@ -119,7 +119,7 @@ class Slcn_algorithm(ClassificationAlgorithm):
         else:
             image_data = (image_data - Rmeans.reshape(1, 4)) / Rstds.reshape(1, 4)
 
-        image_sequence = Data(x=torch.from_numpy(x), batch=torch.zeros(x.shape[0], dtype=torch.int64))
+        image_sequence = Data(x=torch.from_numpy(image_data), batch=torch.zeros(image_data.shape[0], dtype=torch.int64))
         
         print('OK')
 
