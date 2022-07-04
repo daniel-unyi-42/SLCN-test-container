@@ -20,7 +20,7 @@ class MLP(Module):
 
     def forward(self, data):
         data = data.to(self.device)
-        batch = torch.LongTensor([0]).to(self.device)
+        batch = data.batch
         x = data.x
         x = tanh(self.lin1(x))
         x = tanh(self.lin2(x))

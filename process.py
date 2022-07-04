@@ -50,18 +50,18 @@ class Slcn_algorithm(ClassificationAlgorithm):
 
         #This path should lead to your model weights
         if execute_in_docker:
-            self.L_path_model = "/opt/algorithm/checkpoints/L_MLP.pth"
-            self.R_path_model = "/opt/algorithm/checkpoints/R_MLP.pth"
+            self.L_path_model = "/opt/algorithm/checkpoints/LMLP.pt"
+            self.R_path_model = "/opt/algorithm/checkpoints/RMLP.pt"
         else:
-            self.L_path_model = "./weights/L_MLP.pth"
-            self.R_path_model = "./weights/R_MLP.pth"
+            self.L_path_model = "./weights/LMLP.pt"
+            self.R_path_model = "./weights/RMLP.pt"
 
         #You may adapt this to your model/algorithm here.
         self.L_model = MLP(4, [16, 16, 16, 16], 1, device=self.device)
         self.R_model = MLP(4, [16, 16, 16, 16], 1, device=self.device)
         #loading model weights
-        self.L_model.load_state_dict(torch.load(self.L_path_model, map_location=self.device),strict=False)
-        self.R_model.load_state_dict(torch.load(self.R_path_model, map_location=self.device),strict=False)
+        self.L_model.load_state_dict(torch.load(self.L_path_model, map_location=self.device), strict=False)
+        self.R_model.load_state_dict(torch.load(self.R_path_model, map_location=self.device), strict=False)
     
     def save(self):
         with open(str(self._output_file), "w") as f:
@@ -92,27 +92,35 @@ class Slcn_algorithm(ClassificationAlgorithm):
             image_data = np.transpose(image_data, (1,0))
 
         if execute_in_docker:
-            means = np.load('/opt/algorithm/utils/means_template.npy')
-            stds = np.load('/opt/algorithm/utils/stds_template.npy')
+            Lmeans = np.load('/opt/algorithm/utils/means_template_L.npy')
+            Lstds = np.load('/opt/algorithm/utils/stds_template_L.npy')
+            Rmeans = np.load('/opt/algorithm/utils/means_template_R.npy')
+            Rstds = np.load('/opt/algorithm/utils/stds_template_R.npy')
             Lref = nib.load('/opt/algorithm/utils/Lref_template.gii')
         else:
-            means = np.load('./utils/means_template.npy')
-            stds = np.load('./utils/stds_template.npy')
+            Lmeans = np.load('./utils/means_template_L.npy')
+            Lstds = np.load('./utils/stds_template_L.npy')
+            Rmeans = np.load('./utils/means_template_R.npy')
+            Rstds = np.load('./utils/stds_template_R.npy')
             Lref = nib.load('./utils/Lref_template.gii')
 
         Lref = np.stack(Lref.agg_data(), axis=1)
         
         error = np.absolute(np.subtract(image_data, Lref)).mean()
-        
-        print(error)
 
-        image_data = (image_data - means.reshape(1, 4)) / stds.reshape(1, 4)
+        if error < 1.0:
+            image_data = (image_data - Lmeans.reshape(1, 4)) / Lstds.reshape(1, 4)
+        else:
+            image_data = (image_data - Rmeans.reshape(1, 4)) / Rstds.reshape(1, 4)
 
-        image_sequence = Data(x=torch.from_numpy(image_data))
+        image_sequence = Data(x=torch.from_numpy(x), batch=torch.zeros(x.shape[0], dtype=torch.int64))
 
         with torch.no_grad():
         
-            prediction = self.L_model(image_sequence) if error < 1.0 else self.R_model(image_sequence) # 1.385
+            if error < 1.0:
+                prediction = self.L_model(image_sequence)
+            else:
+                prediction = self.R_model(image_sequence)
 
         return prediction.cpu().numpy()[0][0]
 
