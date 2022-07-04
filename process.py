@@ -45,7 +45,7 @@ class Slcn_algorithm(ClassificationAlgorithm):
         ###                                                                                                     ###
 
         # use GPU if available otherwise CPU
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cpu")
         print("===> Using ", self.device)
 
         #This path should lead to your model weights
