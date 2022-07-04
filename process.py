@@ -60,8 +60,10 @@ class Slcn_algorithm(ClassificationAlgorithm):
         self.L_model = MLP(4, [16, 16, 16, 16], 1, device=self.device)
         self.R_model = MLP(4, [16, 16, 16, 16], 1, device=self.device)
         #loading model weights
-        self.L_model.load_state_dict(torch.load(self.L_path_model, map_location=self.device), strict=False)
-        self.R_model.load_state_dict(torch.load(self.R_path_model, map_location=self.device), strict=False)
+        self.L_model.load_state_dict(torch.load(self.L_path_model))
+        self.R_model.load_state_dict(torch.load(self.R_path_model))
+        self.L_model.eval()
+        self.R_model.eval()
     
     def save(self):
         with open(str(self._output_file), "w") as f:
@@ -80,6 +82,8 @@ class Slcn_algorithm(ClassificationAlgorithm):
 
         # Extract a numpy array with image data from the SimpleITK Image
         image_data = SimpleITK.GetArrayFromImage(input_image)
+        
+        print(image_data.shape)
 
         ###                                                                     ###
         ###  TODO: adapt the following part for YOUR submission: make prediction
@@ -107,6 +111,8 @@ class Slcn_algorithm(ClassificationAlgorithm):
         Lref = np.stack(Lref.agg_data(), axis=1)
         
         error = np.absolute(np.subtract(image_data, Lref)).mean()
+        
+        print(error)
 
         if error < 1.0:
             image_data = (image_data - Lmeans.reshape(1, 4)) / Lstds.reshape(1, 4)
@@ -114,6 +120,8 @@ class Slcn_algorithm(ClassificationAlgorithm):
             image_data = (image_data - Rmeans.reshape(1, 4)) / Rstds.reshape(1, 4)
 
         image_sequence = Data(x=torch.from_numpy(x), batch=torch.zeros(x.shape[0], dtype=torch.int64))
+        
+        print('OK')
 
         with torch.no_grad():
         
