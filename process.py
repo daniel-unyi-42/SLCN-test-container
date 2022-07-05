@@ -16,7 +16,6 @@ from evalutils.validators import (
 )
 
 #### Import librairies requiered for your model and predictions
-from torch_geometric.data import Data
 import torch
 from model.mlp import MLP
 import pandas as pd
@@ -118,17 +117,15 @@ class Slcn_algorithm(ClassificationAlgorithm):
             image_data = (image_data - Lmeans.reshape(1, 4)) / Lstds.reshape(1, 4)
         else:
             image_data = (image_data - Rmeans.reshape(1, 4)) / Rstds.reshape(1, 4)
-
-        image_sequence = Data(x=torch.from_numpy(image_data), batch=torch.zeros(image_data.shape[0], dtype=torch.int64))
         
         print('OK')
 
         with torch.no_grad():
         
             if error < 1.0:
-                prediction = self.L_model(image_sequence)
+                prediction = self.L_model(image_data)
             else:
-                prediction = self.R_model(image_sequence)
+                prediction = self.R_model(image_data)
 
         return prediction.cpu().numpy()[0][0]
 
