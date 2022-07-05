@@ -123,9 +123,9 @@ class Slcn_algorithm(ClassificationAlgorithm):
         with torch.no_grad():
         
             if error < 1.0:
-                prediction = self.L_model(image_data)
+                prediction = self.L_model(torch.from_numpy(image_data))
             else:
-                prediction = self.R_model(image_data)
+                prediction = self.R_model(torch.from_numpy(image_data))
 
         return prediction.cpu().numpy()[0][0]
 
