@@ -58,8 +58,7 @@ class Slcn_algorithm(ClassificationAlgorithm):
         self.model.load_state_dict(torch.load(self.path_model))
         self.model.eval()
         
-        from sphericalunet.utils.utils import Get_neighs_order
-        self.neigh_orders = Get_neighs_order()[1]
+        self.neigh_orders = np.load('neigh_orders.npy')
 
 #        #This path should lead to your model weights
 #        if execute_in_docker:
@@ -134,8 +133,8 @@ class Slcn_algorithm(ClassificationAlgorithm):
         
         print(error)
 
+        image_data = image_data[self.neigh_orders].reshape([image_data.shape[0], 28])
         if error > 1.0:
-            image_data = image_data[self.neigh_orders].reshape([image_data.shape[0], 28])
             image_data = image_data[mirror_index]
 
         print(image_data.shape)
