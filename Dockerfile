@@ -24,6 +24,7 @@ COPY --chown=algorithm:algorithm utils/ /opt/algorithm/utils/
 COPY --chown=algorithm:algorithm weights/ /opt/algorithm/checkpoints/
 COPY --chown=algorithm:algorithm process.py /opt/algorithm/
 
+RUN apt-get install ffmpeg libsm6 libxext6  -y
 
 # Install required python packages via pip - you may adapt the requirements.txt to your needs
 RUN python -m pip install --user -r requirements.txt
