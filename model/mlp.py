@@ -23,7 +23,7 @@ class MLP(Module):
         self.to(device)
 
     def forward(self, x):
-        x = x.reshape([1, -1, data.x.shape[-1]])
+        x = x.reshape([1, -1, x.shape[-1]])
         x = self.act(self.lin1(x))
         x = self.bn1(x.transpose(1, 2)).transpose(1, 2)
         x = self.act(self.lin2(x))
