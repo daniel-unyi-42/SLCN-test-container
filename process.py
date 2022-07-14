@@ -143,11 +143,11 @@ class Slcn_algorithm(ClassificationAlgorithm):
 
         with torch.no_grad():
         
-            prediction = self.model(torch.from_numpy(image_data))
+            prediction = self.model(torch.from_numpy(image_data)).cpu().numpy()
 
-        print(prediction.shape)
+        print(prediction, prediction[0][0])
 
-        return prediction.cpu().numpy()[0][0]
+        return prediction[0][0]
 
 if __name__ == "__main__":
 
