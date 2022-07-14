@@ -127,7 +127,10 @@ class Slcn_algorithm(ClassificationAlgorithm):
         
         print(image_data)
         
+        print(self.mirror_index)
+        
         if error > 1.0:
+            print('Here')
             image_data = image_data[self.mirror_index]
 
         print(image_data)
