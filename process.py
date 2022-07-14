@@ -126,11 +126,15 @@ class Slcn_algorithm(ClassificationAlgorithm):
 #            Rstds = np.load('./utils/stds_template_R.npy')
 #            Lref = nib.load('./utils/Lref_template.gii')
 
+        print(image_data)
+
         error = np.absolute(np.subtract(image_data, Lref)).mean()
         
         print(error)
 
         image_data = image_data[self.neigh_orders].reshape([image_data.shape[0], 28])
+        
+        print(image_data)
         
         if error > 1.0:
             image_data = image_data[self.mirror_index]
