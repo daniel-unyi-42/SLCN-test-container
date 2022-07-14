@@ -128,7 +128,7 @@ class Slcn_algorithm(ClassificationAlgorithm):
 
         print(image_data)
 
-        error = np.absolute(np.subtract(image_data, Lref)).mean()
+        error = np.absolute(np.subtract(image_data, self.Lref)).mean()
         
         print(error)
 
