@@ -53,11 +53,15 @@ class Slcn_algorithm(ClassificationAlgorithm):
             self.path_model = "/opt/algorithm/checkpoints/MLP2.pt"
             self.neigh_orders = np.load('/opt/algorithm/utils/neigh_orders.npy')
             self.mirror_index = np.load('/opt/algorithm/utils/mirror_index.npy')
+            self.means = np.load('/opt/algorithm/utils/means_template.npy')
+            self.stds = np.load('/opt/algorithm/utils/stds_template.npy')
             self.Lref = nib.load('/opt/algorithm/utils/Lref_template.gii')
         else:
             self.path_model = "./weights/MLP2_EXTENDEDVAL.pt"
             self.neigh_orders = np.load('./utils/neigh_orders.npy')
             self.mirror_index = np.load('./utils/mirror_index.npy')
+            self.means = np.load('./utils/means_template.npy')
+            self.stds = np.load('./utils/stds_template.npy')
             self.Lref = nib.load('./utils/Lref_template.gii')
         self.Lref = np.stack(self.Lref.agg_data(), axis=1)
         self.model = MLP(28, [28, 28, 28, 28], 3, device=self.device)
@@ -113,19 +117,6 @@ class Slcn_algorithm(ClassificationAlgorithm):
         else:
             image_data = np.transpose(image_data, (1,0))
 
-#        if execute_in_docker:
-#            Lmeans = np.load('/opt/algorithm/utils/means_template_L.npy')
-#            Lstds = np.load('/opt/algorithm/utils/stds_template_L.npy')
-#            Rmeans = np.load('/opt/algorithm/utils/means_template_R.npy')
-#            Rstds = np.load('/opt/algorithm/utils/stds_template_R.npy')
-#            Lref = nib.load('/opt/algorithm/utils/Lref_template.gii')
-#        else:
-#            Lmeans = np.load('./utils/means_template_L.npy')
-#            Lstds = np.load('./utils/stds_template_L.npy')
-#            Rmeans = np.load('./utils/means_template_R.npy')
-#            Rstds = np.load('./utils/stds_template_R.npy')
-#            Lref = nib.load('./utils/Lref_template.gii')
-
         print(image_data)
 
         error = np.absolute(np.subtract(image_data, self.Lref)).mean()
@@ -139,6 +130,10 @@ class Slcn_algorithm(ClassificationAlgorithm):
         if error > 1.0:
             image_data = image_data[self.mirror_index]
 
+        print(image_data)
+        
+        image_data = (image_data - self.means) / self.stds
+        
         print(image_data)
 
         with torch.no_grad():
