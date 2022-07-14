@@ -152,3 +152,5 @@ class Slcn_algorithm(ClassificationAlgorithm):
 if __name__ == "__main__":
 
     Slcn_algorithm().process()
+
+
