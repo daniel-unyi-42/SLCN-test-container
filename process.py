@@ -55,7 +55,7 @@ class Slcn_algorithm(ClassificationAlgorithm):
             self.mirror_index = np.load('/opt/algorithm/utils/mirror_index.npy')
             self.Lref = nib.load('/opt/algorithm/utils/Lref_template.gii')
         else:
-            self.path_model = "./weights/MLP2.pt"
+            self.path_model = "./weights/MLP2_EXTENDEDVAL.pt"
             self.neigh_orders = np.load('./utils/neigh_orders.npy')
             self.mirror_index = np.load('./utils/mirror_index.npy')
             self.Lref = nib.load('./utils/Lref_template.gii')
