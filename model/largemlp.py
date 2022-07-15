@@ -4,10 +4,10 @@ from torch.nn import Module, Linear, BatchNorm1d, Dropout, Sequential
 from torch.nn.functional import relu, leaky_relu, selu
 from torch import sigmoid, tanh
 
-class MLP(Module):
+class LargeMLP(Module):
 
     def __init__(self, in_dim, hidden_dims, out_dim, device):
-        super(MLP, self).__init__()
+        super(LargeMLP, self).__init__()
         self.device = device
         self.lin1 = Linear(in_dim, hidden_dims[0])
         self.bn1 = BatchNorm1d(hidden_dims[0])
@@ -29,7 +29,7 @@ class MLP(Module):
         
         self.lin9 = Linear(hidden_dims[3], hidden_dims[3])
         self.lin10 = Linear(hidden_dims[3], out_dim)
-        self.act = relu
+        self.act = tanh
         self.to(device)
 
     def forward(self, x):
