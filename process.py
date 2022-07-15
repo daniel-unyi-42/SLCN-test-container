@@ -50,14 +50,14 @@ class Slcn_algorithm(ClassificationAlgorithm):
         
         # current model
         if execute_in_docker:
-            self.path_model = "/opt/algorithm/checkpoints/MLP2.pt"
+            self.path_model = "/opt/algorithm/checkpoints/MLP_template.pt"
             self.neigh_orders = np.load('/opt/algorithm/utils/neigh_orders.npy')
             self.mirror_index = np.load('/opt/algorithm/utils/mirror_index.npy')
             self.means = np.load('/opt/algorithm/utils/means_template.npy')
             self.stds = np.load('/opt/algorithm/utils/stds_template.npy')
             self.Lref = nib.load('/opt/algorithm/utils/Lref_template.gii')
         else:
-            self.path_model = "./weights/MLP2.pt"
+            self.path_model = "./weights/MLP_template.pt"
             self.neigh_orders = np.load('./utils/neigh_orders.npy')
             self.mirror_index = np.load('./utils/mirror_index.npy')
             self.means = np.load('./utils/means_template.npy')
